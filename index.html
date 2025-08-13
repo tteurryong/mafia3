@@ -94,19 +94,24 @@ function renderScores(){ const ids=Object.keys(scores).map(x=>parseInt(x)).sort(
 resetScoreBtn.onclick = ()=>{ if(confirm('저장된 점수를 모두 초기화할까요?')){ scores={}; saveScores(); renderScores(); } };
 
 loadScores(); renderScores();
-
 /* 메시지 큐: 한 줄씩 3초 유지 */
 let _msgQueue = [];
+let _msgTimer = null;
+function _processMsgQueue(){
+  if(_msgQueue.length===0){ _msgTimer = null; messages.textContent='(현재 메시지 없음)'; return; }
+  const line = _msgQueue.shift();
+  messages.textContent = line;
+  _msgTimer = setTimeout(_processMsgQueue, 3000);
+}
 function logLine(text, clear=false){
   if(clear){
     _msgQueue = [];
     if(_msgTimer){ clearTimeout(_msgTimer); _msgTimer=null; }
     messages.textContent = '';
   }
-  // _msgQueue.push('' + text);  // 이 부분 삭제
-  // _processMsgQueue();         // 이 부분 삭제
-
-  // 그냥 바로 전체 메시지를 한 번에 보여주기
+  _msgQueue.push('' + text);
+  if(!_msgTimer) _processMsgQueue();
+  }
   messages.textContent += text + '\n';
                      }
 
